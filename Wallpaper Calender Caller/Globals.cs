@@ -58,6 +58,40 @@ namespace Wallpaper_Calender_Caller
             return ret;
         }
 
+        public static string GetRandomWallpaper(string folder, string lastEntry)
+        {
+            // *.bmp; *.jpeg; *.jpg; *.png"
+            try
+            {
+                DirectoryInfo di = new DirectoryInfo(folder);
+                string[] extentionArray = new string[] { ".bmp", ".jpeg", ".jpg", ".png" };
+                HashSet<string> allowedExtensions = new HashSet<string>(extentionArray, StringComparer.OrdinalIgnoreCase);
+                Random rd = new Random();
+                int ran = -1;
+                FileInfo[] files = Array.FindAll(di.GetFiles(), f => allowedExtensions.Contains(f.Extension));
+                for (int i = 0; i < 10; i++)
+                {
+                    ran = rd.Next(files.Count());
+                    if (files[ran].Name != lastEntry) break;
+                }
+                return Path.Combine(folder, files[ran].Name);
+            }
+            catch { return ""; }
+        }
+
+        public static void SetWallpaper(string file, Wallpaper.Style style)
+        {
+            Wallpaper.Set(new Uri(file), style);
+        }
+
+        public static DateTime DateFromString(string date)
+        {
+            string[] split = date.Split('/');
+            int month = Convert.ToInt32(split[0]);
+            int day = Convert.ToInt32(split[1]);
+            int year = Convert.ToInt32(split[2]);
+            return new DateTime(year, month, day);
+        }
     }
 
     public class Settings

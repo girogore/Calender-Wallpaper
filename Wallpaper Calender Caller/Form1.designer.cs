@@ -51,6 +51,7 @@
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.monthCalendar1 = new Pabo.Calendar.MonthCalendar();
+            this.setWallpaperBT = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -176,7 +177,7 @@
             this.editToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(943, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(593, 24);
             this.menuStrip1.TabIndex = 13;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -287,12 +288,23 @@
             this.monthCalendar1.MonthChanged += new Pabo.Calendar.MonthChangedEventHandler(this.monthCalendar1_MonthChanged);
             this.monthCalendar1.DayClick += new Pabo.Calendar.DayClickEventHandler(this.monthCalendar1_DateChanged);
             // 
+            // setWallpaperBT
+            // 
+            this.setWallpaperBT.Location = new System.Drawing.Point(496, 146);
+            this.setWallpaperBT.Name = "setWallpaperBT";
+            this.setWallpaperBT.Size = new System.Drawing.Size(92, 23);
+            this.setWallpaperBT.TabIndex = 15;
+            this.setWallpaperBT.Text = "Set Wallpaper";
+            this.setWallpaperBT.UseVisualStyleBackColor = true;
+            this.setWallpaperBT.Click += new System.EventHandler(this.setWallpaperBT_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(943, 292);
+            this.ClientSize = new System.Drawing.Size(593, 213);
+            this.Controls.Add(this.setWallpaperBT);
             this.Controls.Add(this.monthCalendar1);
             this.Controls.Add(this.pasteBT);
             this.Controls.Add(this.copyBT);
@@ -345,6 +357,7 @@
         private System.Windows.Forms.ToolStripMenuItem pasteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
         private Pabo.Calendar.MonthCalendar monthCalendar1;
+        private System.Windows.Forms.Button setWallpaperBT;
     }
 }
 

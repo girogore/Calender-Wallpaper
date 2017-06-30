@@ -32,6 +32,7 @@ namespace Wallpaper_Calender_Caller
             this.monthCalendar1.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
             this.monthCalendar1.MaxDate = new DateTime(DateTime.Now.Year, 12, 31);
             this.monthCalendar1.Header.Text = ((Months)DateTime.Now.Month).ToString();
+            this.monthCalendar1.SelectDate(DateTime.Now);
             defaultTitle = this.Text;
             TextReader tr = new StringReader(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -171,17 +172,6 @@ namespace Wallpaper_Calender_Caller
             return new XDocument();
         }
 
-        private void monthCalendar1_DateChanged(object sender, DayClickEventArgs e)
-        {
-            string[] split = e.Date.Split('/');
-            int month = Convert.ToInt32(split[0]);
-            int day = Convert.ToInt32(split[1]);
-            int year = Convert.ToInt32(split[2]);
-            Settings settings = LoadDate(new DateTime(year, month, day));
-            UpdateSettings(settings);
-            setStartingText(settings.file);
-        }
-
         private Settings LoadDate(DateTime loadDate)
         {
             //Go through settings, find date, load settings
@@ -311,6 +301,7 @@ namespace Wallpaper_Calender_Caller
             tiledRB.Checked = false;
             stretchedRB.Checked = true;
             centeredRB.Checked = false;
+            setBT.Text = "SET";
             RemoveBoldDate(currentDate);
         }
 
@@ -327,12 +318,13 @@ namespace Wallpaper_Calender_Caller
                 settingsFile = LoadSettingsFile(openFileDialog1.FileName);
                 currentLoadedFile = openFileDialog1.FileName;
                 SetTitleBar(currentLoadedFile);
-                Settings currentSettings = LoadDate(this.monthCalendar1.SelectedDates[0]);
+                Settings currentSettings = LoadDate(DateTime.Now);
                 UpdateSettings(currentSettings);
                 setStartingText(currentSettings.file);
                 timeSinceSave = DateTime.Now;
-                boldedDates.AddRange(Globals.LoadDates().ToArray());
                 monthCalendar1.ResetDateInfo();
+                boldedDates.Clear();
+                boldedDates.AddRange(Globals.LoadDates().ToArray());
                 monthCalendar1.AddDateInfo(BoldTheseDates(boldedDates).ToArray());
             }
         }
@@ -398,17 +390,13 @@ namespace Wallpaper_Calender_Caller
             DateItem ret = new DateItem();
             ret.Date = date;
             ret.BackColor1 = Color.Green;
-            ret.ImageListIndex = 3;
-            ret.Text = file;
+            //ret.Text = file;
             return ret;
         }
         private List<DateItem> BoldTheseDates(List<DateEntry> dates)
         {
             List<DateItem> ret = new List<DateItem>();
-            foreach (DateEntry date in dates)
-            {
-                ret.Add(BoldDate(date.date, date.fileName));
-            }
+            foreach (DateEntry date in dates) ret.Add(BoldDate(date.date, date.fileName));
             return ret;
         }
         private void RemoveBoldDate(DateTime date)
@@ -423,10 +411,48 @@ namespace Wallpaper_Calender_Caller
                 }
             }
         }
-
+        private void RemoveBoldDate(DateTime[] dates)
+        {
+            foreach (DateEntry de in boldedDates)
+            {
+                if (dates.Contains(de.date))
+                {
+                    boldedDates.Remove(de);
+                    monthCalendar1.RemoveDateInfo(de.date);
+                }
+            }
+        }
         private void monthCalendar1_MonthChanged(object sender, MonthChangedEventArgs e)
         {
+            this.monthCalendar1.SelectDate(new DateTime(e.Year, e.Month, 1));
             monthCalendar1.Header.Text = ((Months)e.Month).ToString();
         }
+
+        private void setWallpaperBT_Click(object sender, EventArgs e)
+        {
+            if (textBox1.Text == "") return;
+            DateEntry wallpaperData;
+            Settings settings = LoadSettings();
+            wallpaperData = new DateEntry(DateTime.Now, settings.file, settings.style);
+            string wallPaper = wallpaperData.fileName;
+            string newFile = "";
+            if (!Path.HasExtension(wallpaperData.fileName))
+            {
+                newFile = Globals.GetRandomWallpaper(wallpaperData.fileName, "");
+                if (newFile != "")
+                    wallPaper = newFile;
+                else
+                    return;
+            }
+            Globals.SetWallpaper(wallPaper, wallpaperData.style);
+        }
+        private void monthCalendar1_DateChanged(object sender, DayClickEventArgs e)
+        {
+            this.monthCalendar1.SelectDate(Globals.DateFromString(e.Date));
+            Settings settings = LoadDate(Globals.DateFromString(e.Date));
+            UpdateSettings(settings);
+            setStartingText(settings.file);
+        }
+
     }
 }

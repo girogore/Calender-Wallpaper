@@ -41,13 +41,13 @@ namespace Wallpaper_Calender_Caller
                     if (!Path.HasExtension(wallpaperData.fileName))
                     {
                         string lastEntry = root.Element("LastEntry").Value;
-                        newFile = GetRandomWallpaper(wallpaperData.fileName, lastEntry);
+                        newFile = Globals.GetRandomWallpaper(wallpaperData.fileName, lastEntry);
                         if (newFile != "")
                             wallPaper = newFile;
                         else
                             return;
                     }
-                    SetWallpaper(wallPaper, wallpaperData.style);
+                    Globals.SetWallpaper(wallPaper, wallpaperData.style);
                     root.Element("Day").Value = DateTime.Now.ToShortDateString();
                     root.Element("File").Value = wallpaperData.fileName;
                     root.Element("Style").Value = wallpaperData.style.ToString();
@@ -56,27 +56,6 @@ namespace Wallpaper_Calender_Caller
                 }
                 catch { }
             }
-        }
-
-        public static string GetRandomWallpaper(string folder, string lastEntry)
-        {
-            // *.bmp; *.jpeg; *.jpg; *.png"
-            DirectoryInfo di = new DirectoryInfo(folder);
-            string[] extentionArray = new string[] { ".bmp", ".jpeg", ".jpg", ".png" };
-            HashSet<string> allowedExtensions = new HashSet<string>(extentionArray, StringComparer.OrdinalIgnoreCase);
-            Random rd = new Random();
-            int ran = -1;
-            try
-            {
-                FileInfo[] files = Array.FindAll(di.GetFiles(), f => allowedExtensions.Contains(f.Extension));
-                for (int i = 0; i < 10; i++)
-                {
-                    ran = rd.Next(files.Count());
-                    if (files[ran].Name != lastEntry) break;
-                }
-                return Path.Combine(folder, files[ran].Name);
-            }
-            catch { return ""; }
         }
 
         public static DateEntry GetCurrentWallpaper()
@@ -124,11 +103,6 @@ namespace Wallpaper_Calender_Caller
                 }
             }
             return ret;
-        }
-
-        public static void SetWallpaper(string file, Wallpaper.Style style)
-        {
-            Wallpaper.Set(new Uri(file), style);
         }
     }
 }

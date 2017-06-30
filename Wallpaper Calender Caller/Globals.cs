@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -35,6 +36,27 @@ namespace Wallpaper_Calender_Caller
 
         static public string getSettingsFile() {return settingsFile;}
         static public void setSettingsFile(string file){settingsFile = file;}
+
+        public static List<DateEntry> LoadDates()
+        {
+            List<DateEntry> ret = new List<DateEntry>();
+            XDocument settingsFile = XDocument.Load(Globals.getSettingsFile());
+            XElement root = settingsFile.Root.Element("Calender");
+            Match match;
+            foreach (XElement month in root.Elements())
+            {
+                foreach (XElement day in month.Elements())
+                {
+                    match = Regex.Match(day.Name.ToString(), @"\d+");
+                    ret.Add(
+                        new DateEntry(
+                        new DateTime(DateTime.Now.Year, (int)Globals.ToEnum<Months>(month.Name.ToString()), Convert.ToInt32(match.Value)),
+                        day.Element("File").Value.ToString(),
+                        Globals.ToEnum<Wallpaper.Style>(day.Element("Style").Value.ToString())));
+                }
+            }
+            return ret;
+        }
 
     }
 

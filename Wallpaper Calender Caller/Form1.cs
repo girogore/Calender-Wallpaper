@@ -12,6 +12,7 @@ using System.IO;
 using System.Xml;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using Pabo.Calendar;
 
 namespace Wallpaper_Calender_Caller
 {
@@ -23,11 +24,14 @@ namespace Wallpaper_Calender_Caller
         DateTime timeSinceSave = DateTime.Now;
         Settings copySettings;
         string startingText = "";
-        List<DateTime> boldedDates = new List<DateTime>();
+        List<DateEntry> boldedDates = new List<DateEntry>();
 
         public Form1()
         {
             InitializeComponent();
+            this.monthCalendar1.MinDate = new DateTime(DateTime.Now.Year, 1, 1);
+            this.monthCalendar1.MaxDate = new DateTime(DateTime.Now.Year, 12, 31);
+            this.monthCalendar1.Header.Text = ((Months)DateTime.Now.Month).ToString();
             defaultTitle = this.Text;
             TextReader tr = new StringReader(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -54,7 +58,7 @@ namespace Wallpaper_Calender_Caller
                 "   </Calender>\n" +
                 "</header>");
             settingsFile = XDocument.Load(tr);
-            Settings currentSettings = LoadDate(this.monthCalendar1.SelectionStart);
+            Settings currentSettings = LoadDate(DateTime.Now);
             UpdateSettings(currentSettings);
             Globals.setSettingsFile("");
         }
@@ -167,9 +171,13 @@ namespace Wallpaper_Calender_Caller
             return new XDocument();
         }
 
-        private void monthCalendar1_DateChanged(object sender, DateRangeEventArgs e)
+        private void monthCalendar1_DateChanged(object sender, DayClickEventArgs e)
         {
-            Settings settings = LoadDate(e.Start);
+            string[] split = e.Date.Split('/');
+            int month = Convert.ToInt32(split[0]);
+            int day = Convert.ToInt32(split[1]);
+            int year = Convert.ToInt32(split[2]);
+            Settings settings = LoadDate(new DateTime(year, month, day));
             UpdateSettings(settings);
             setStartingText(settings.file);
         }
@@ -271,21 +279,21 @@ namespace Wallpaper_Calender_Caller
         }
         private void setBT_Click(object sender, EventArgs e)
         {
-            DateTime currentDate = monthCalendar1.SelectionStart;
+            DateTime currentDate = monthCalendar1.SelectedDates[0];
             Settings currentSettings = LoadSettings();
             SetDate(currentDate, currentSettings);
             setStartingText(currentSettings.file);
             if (textBox1.Text != "")
             {
-                boldedDates.Add(currentDate);
-                monthCalendar1.MonthlyBoldedDates = boldedDates.ToArray();
+                DateItem di = BoldDate(currentDate, currentSettings.file);
+                boldedDates.Add(new DateEntry(currentDate, currentSettings.file, Wallpaper.Style.Centered));
+                monthCalendar1.AddDateInfo(di);
             }
             else
             {
                 bool success = RemoveDate(currentDate);
                 textBox1.Text = "";
-                boldedDates.Remove(currentDate);
-                monthCalendar1.MonthlyBoldedDates = boldedDates.ToArray();
+                RemoveBoldDate(currentDate);
             }
         }
 
@@ -297,14 +305,13 @@ namespace Wallpaper_Calender_Caller
 
         private void clearBT_Click(object sender, EventArgs e)
         {
-            DateTime currentDate = monthCalendar1.SelectionStart;
+            DateTime currentDate = monthCalendar1.SelectedDates[0];
             bool success = RemoveDate(currentDate);
             textBox1.Text = "";
             tiledRB.Checked = false;
             stretchedRB.Checked = true;
             centeredRB.Checked = false;
-            boldedDates.Remove(currentDate);
-            monthCalendar1.MonthlyBoldedDates = boldedDates.ToArray();
+            RemoveBoldDate(currentDate);
         }
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -320,30 +327,14 @@ namespace Wallpaper_Calender_Caller
                 settingsFile = LoadSettingsFile(openFileDialog1.FileName);
                 currentLoadedFile = openFileDialog1.FileName;
                 SetTitleBar(currentLoadedFile);
-                Settings currentSettings = LoadDate(this.monthCalendar1.SelectionStart);
+                Settings currentSettings = LoadDate(this.monthCalendar1.SelectedDates[0]);
                 UpdateSettings(currentSettings);
                 setStartingText(currentSettings.file);
                 timeSinceSave = DateTime.Now;
-                boldedDates.AddRange(LoadDates());
-                monthCalendar1.MonthlyBoldedDates = boldedDates.ToArray();
+                boldedDates.AddRange(Globals.LoadDates().ToArray());
+                monthCalendar1.ResetDateInfo();
+                monthCalendar1.AddDateInfo(BoldTheseDates(boldedDates).ToArray());
             }
-        }
-
-        private List<DateTime> LoadDates()
-        {
-            List<DateTime> ret = new List<DateTime>();
-            XDocument settingsFile = XDocument.Load(Globals.getSettingsFile());
-            XElement root = settingsFile.Root.Element("Calender");
-            Match match;
-            foreach (XElement month in root.Elements())
-            {
-                foreach (XElement day in month.Elements())
-                {
-                    match = Regex.Match(day.Name.ToString(), @"\d+");
-                    ret.Add(new DateTime(DateTime.Now.Year, (int)Globals.ToEnum<Months>(month.Name.ToString()), Convert.ToInt32(match.Value)));
-                }
-            }
-            return ret;
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -400,6 +391,42 @@ namespace Wallpaper_Calender_Caller
         {
             if (textBox1.Text != startingText) setBT.Text = "*SET*";
             else setBT.Text = "SET";
+        }
+
+        private DateItem BoldDate(DateTime date, string file)
+        {
+            DateItem ret = new DateItem();
+            ret.Date = date;
+            ret.BackColor1 = Color.Green;
+            ret.ImageListIndex = 3;
+            ret.Text = file;
+            return ret;
+        }
+        private List<DateItem> BoldTheseDates(List<DateEntry> dates)
+        {
+            List<DateItem> ret = new List<DateItem>();
+            foreach (DateEntry date in dates)
+            {
+                ret.Add(BoldDate(date.date, date.fileName));
+            }
+            return ret;
+        }
+        private void RemoveBoldDate(DateTime date)
+        {
+            foreach (DateEntry di in boldedDates)
+            {
+                if (di.date == date)
+                {
+                    boldedDates.Remove(di);
+                    monthCalendar1.RemoveDateInfo(di.date);
+                    break;
+                }
+            }
+        }
+
+        private void monthCalendar1_MonthChanged(object sender, MonthChangedEventArgs e)
+        {
+            monthCalendar1.Header.Text = ((Months)e.Month).ToString();
         }
     }
 }

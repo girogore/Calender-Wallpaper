@@ -253,24 +253,39 @@
             // 
             this.monthCalendar1.ActiveMonth.Month = 6;
             this.monthCalendar1.ActiveMonth.Year = 2017;
+            this.monthCalendar1.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(197)))), ((int)(((byte)(198)))), ((int)(((byte)(214)))));
             this.monthCalendar1.Culture = new System.Globalization.CultureInfo("en-US");
+            this.monthCalendar1.Footer.Align = Pabo.Calendar.mcTextAlign.Center;
             this.monthCalendar1.Footer.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.monthCalendar1.Footer.ShowToday = false;
+            this.monthCalendar1.Header.BackColor1 = System.Drawing.Color.FromArgb(((int)(((byte)(177)))), ((int)(((byte)(179)))), ((int)(((byte)(200)))));
             this.monthCalendar1.Header.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
+            this.monthCalendar1.Header.ShowMonth = false;
             this.monthCalendar1.Header.TextColor = System.Drawing.Color.White;
             this.monthCalendar1.ImageList = null;
             this.monthCalendar1.Location = new System.Drawing.Point(0, 24);
             this.monthCalendar1.MaxDate = new System.DateTime(2017, 12, 31, 0, 0, 0, 0);
             this.monthCalendar1.MinDate = new System.DateTime(2017, 1, 1, 0, 0, 0, 0);
             this.monthCalendar1.Month.BackgroundImage = null;
+            this.monthCalendar1.Month.Colors.Focus.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(211)))), ((int)(((byte)(213)))), ((int)(((byte)(224)))));
+            this.monthCalendar1.Month.Colors.Focus.Border = System.Drawing.Color.FromArgb(((int)(((byte)(197)))), ((int)(((byte)(198)))), ((int)(((byte)(214)))));
+            this.monthCalendar1.Month.Colors.Selected.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(197)))), ((int)(((byte)(198)))), ((int)(((byte)(214)))));
+            this.monthCalendar1.Month.Colors.Selected.Border = System.Drawing.Color.FromArgb(((int)(((byte)(95)))), ((int)(((byte)(97)))), ((int)(((byte)(135)))));
             this.monthCalendar1.Month.DateFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.monthCalendar1.Month.TextFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.monthCalendar1.Name = "monthCalendar1";
             this.monthCalendar1.SelectionMode = Pabo.Calendar.mcSelectionMode.One;
             this.monthCalendar1.ShowFocus = false;
+            this.monthCalendar1.ShowFooter = false;
+            this.monthCalendar1.ShowToday = false;
             this.monthCalendar1.Size = new System.Drawing.Size(232, 184);
             this.monthCalendar1.TabIndex = 14;
             this.monthCalendar1.Weekdays.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.monthCalendar1.Weekdays.TextColor = System.Drawing.Color.FromArgb(((int)(((byte)(177)))), ((int)(((byte)(179)))), ((int)(((byte)(200)))));
             this.monthCalendar1.Weeknumbers.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            this.monthCalendar1.Weeknumbers.TextColor = System.Drawing.Color.FromArgb(((int)(((byte)(177)))), ((int)(((byte)(179)))), ((int)(((byte)(200)))));
+            this.monthCalendar1.MonthChanged += new Pabo.Calendar.MonthChangedEventHandler(this.monthCalendar1_MonthChanged);
+            this.monthCalendar1.DayClick += new Pabo.Calendar.DayClickEventHandler(this.monthCalendar1_DateChanged);
             // 
             // Form1
             // 

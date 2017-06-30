@@ -37,13 +37,13 @@ namespace Wallpaper_Calender_Caller
                     DateEntry wallpaperData;
                     wallpaperData = GetCurrentWallpaper();
                     string wallPaper = wallpaperData.fileName;
-                    Tuple<string, int> newFile = new Tuple<string, int>("", -1);
+                    string newFile = "";
                     if (!Path.HasExtension(wallpaperData.fileName))
                     {
-                        int lastEntry = Convert.ToInt32(root.Element("LastEntry").Value);
+                        string lastEntry = root.Element("LastEntry").Value;
                         newFile = GetRandomWallpaper(wallpaperData.fileName, lastEntry);
-                        if (newFile.Item1 != "")
-                            wallPaper = newFile.Item1;
+                        if (newFile != "")
+                            wallPaper = newFile;
                         else
                             return;
                     }
@@ -51,32 +51,32 @@ namespace Wallpaper_Calender_Caller
                     root.Element("Day").Value = DateTime.Now.ToShortDateString();
                     root.Element("File").Value = wallpaperData.fileName;
                     root.Element("Style").Value = wallpaperData.style.ToString();
-                    root.Element("LastEntry").Value = newFile.Item2.ToString();
+                    root.Element("LastEntry").Value = newFile;
                     Globals.Beautify(settingsFile, Globals.getSettingsFile());
                 }
                 catch { }
             }
         }
 
-        public static Tuple<string, int> GetRandomWallpaper(string folder, int lastEntry)
+        public static string GetRandomWallpaper(string folder, string lastEntry)
         {
             // *.bmp; *.jpeg; *.jpg; *.png"
             DirectoryInfo di = new DirectoryInfo(folder);
             string[] extentionArray = new string[] { ".bmp", ".jpeg", ".jpg", ".png" };
             HashSet<string> allowedExtensions = new HashSet<string>(extentionArray, StringComparer.OrdinalIgnoreCase);
-            int ran = -1;
             Random rd = new Random();
+            int ran = -1;
             try
             {
                 FileInfo[] files = Array.FindAll(di.GetFiles(), f => allowedExtensions.Contains(f.Extension));
                 for (int i = 0; i < 10; i++)
                 {
                     ran = rd.Next(files.Count());
-                    if (ran != lastEntry) break;
+                    if (files[ran].Name != lastEntry) break;
                 }
-                return new Tuple<string, int>(Path.Combine(folder, files[ran].Name), ran);
+                return Path.Combine(folder, files[ran].Name);
             }
-            catch { return new Tuple<string, int>("", -1); }
+            catch { return ""; }
         }
 
         public static DateEntry GetCurrentWallpaper()

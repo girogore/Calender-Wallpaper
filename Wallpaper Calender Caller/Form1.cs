@@ -18,13 +18,13 @@ namespace Wallpaper_Calender_Caller
 {
     public partial class Form1 : Form
     {
-        XDocument settingsFile = new XDocument();
         string currentLoadedFile = "";
         string defaultTitle = "";
         DateTime timeSinceSave = DateTime.Now;
         Settings copySettings;
         string startingText = "";
         List<DateEntry> boldedDates = new List<DateEntry>();
+        SaveFile saveFile;
 
         public Form1()
         {
@@ -58,10 +58,9 @@ namespace Wallpaper_Calender_Caller
                 "       <December></December>\n" +
                 "   </Calender>\n" +
                 "</header>");
-            settingsFile = XDocument.Load(tr);
+            saveFile = new SaveFile(XDocument.Load(tr));
             Settings currentSettings = LoadDate(DateTime.Now);
-            UpdateSettings(currentSettings);
-            Globals.setSettingsFile("");
+            UpdateSettings(currentSettings, DateTime.Now);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -74,16 +73,13 @@ namespace Wallpaper_Calender_Caller
                 {
                     // Cancel the Closing event from closing the form.
                     {
-                        XElement root = settingsFile.Root.Element("CurrentDate");
+                        XElement root = saveFile.getXML().Root.Element("CurrentDate");
                         // If it is the same day, and its a slideshow, don't change it.
                         root.Element("Day").Value = new DateTime(1999, 1, 1).ToShortDateString();
                         root.Element("File").Value = "";
                         root.Element("Style").Value = "";
 
-                        foreach (Months month in Enum.GetValues(typeof(Months)))
-                        {
-                            SortMonth(month);
-                        }
+                        foreach (Months month in Enum.GetValues(typeof(Months))){SortMonth(month);}
                         if (currentLoadedFile == "")
                         {
                             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
@@ -95,14 +91,14 @@ namespace Wallpaper_Calender_Caller
                             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                             {
                                 currentLoadedFile = saveFileDialog1.FileName;
-                                settingsFile.Beautify(currentLoadedFile);
+                                saveFile.getXML().Beautify(currentLoadedFile);
                                 SetTitleBar(currentLoadedFile);
                                 timeSinceSave = DateTime.Now;
                             }
                         }
                         else
                         {
-                            settingsFile.Beautify(currentLoadedFile);
+                            saveFile.getXML().Beautify(currentLoadedFile);
                             SetTitleBar(currentLoadedFile);
                         }
                     }
@@ -111,34 +107,22 @@ namespace Wallpaper_Calender_Caller
                     e.Cancel = true;
             }
         }
-
-        public void SetTitleBar(string newTitle)
+        private void SetTitleBar(string newTitle)
         {
-            if (newTitle.Length > 60)
-            {
-                string[] split = newTitle.Split('\\');
-                List<string> finalName = new List<string>();
-                int count = 0;
-                foreach (string folder in split.Reverse()) {
-                    count += folder.Length;
-                    if (count > 60)
-                    {
-                        finalName.Reverse();
-                        newTitle = "";
-                        foreach (string finalFolder in finalName)
-                        {
-                            newTitle += "\\" + finalFolder;
-                        }
-                        newTitle = "..." + newTitle;
-                    }
-                    else
-                        finalName.Add(folder);
-                }
-            }
-            this.Text = defaultTitle + " [" + newTitle + "]";
+            this.Text = defaultTitle + " [" + Globals.ShortenPath(newTitle, 60) + "]";
         }
 
-        private void UpdateSettings(Settings settings)
+        private void SetLabel(DateTime date)
+        {
+            this.currentWPLabel.Text = Globals.ShortenPath(saveFile.GetCurrentWallpaper(date).fileName, 50);
+        }
+        private void setStartingText(string file)
+        {
+            startingText = file;
+            setBT.Text = "SET";
+        }
+
+        private void UpdateSettings(Settings settings, DateTime date)
         {
             tiledRB.Checked = false;
             stretchedRB.Checked = false;
@@ -151,9 +135,10 @@ namespace Wallpaper_Calender_Caller
             }
             textBox1.Text = settings.file;
             setStartingText(settings.file);
+            SetLabel(date);
         }
 
-        private Settings LoadSettings()
+        private Settings GetCurrentSettings()
         {
             Wallpaper.Style style = Wallpaper.Style.Stretched;
             if (centeredRB.Checked) style = Wallpaper.Style.Centered;
@@ -166,7 +151,7 @@ namespace Wallpaper_Calender_Caller
         {
             if (File.Exists(path))
             {
-                Globals.setSettingsFile(path);
+                saveFile.setSettingsFileName(path);
                 return XDocument.Load(path);
             }
             return new XDocument();
@@ -175,7 +160,7 @@ namespace Wallpaper_Calender_Caller
         private Settings LoadDate(DateTime loadDate)
         {
             //Go through settings, find date, load settings
-            XElement root = settingsFile.Root.Element("Calender").Element(((Months)loadDate.Month).ToString());
+            XElement root = saveFile.getXML().Root.Element("Calender").Element(((Months)loadDate.Month).ToString());
             Match match;
             foreach (XElement node in root.Elements())
             {
@@ -191,7 +176,7 @@ namespace Wallpaper_Calender_Caller
 
         private bool RemoveDate(DateTime removeDate)
         {
-            XElement root = settingsFile.Root.Element("Calender").Element(((Months)removeDate.Month).ToString());
+            XElement root = saveFile.getXML().Root.Element("Calender").Element(((Months)removeDate.Month).ToString());
             Match match;
             foreach (XElement node in root.Elements())
             {
@@ -199,6 +184,7 @@ namespace Wallpaper_Calender_Caller
                 if (Convert.ToInt32(match.Value) == removeDate.Day)
                 {
                     node.Remove();
+                    foreach (Months month in Enum.GetValues(typeof(Months))) SortMonth(month);
                     return true;
                 }
             }
@@ -208,7 +194,7 @@ namespace Wallpaper_Calender_Caller
         private void SetDate(DateTime setDate, Settings settings)
         {
             if (textBox1.Text == "") { return; }
-            XElement root = settingsFile.Root.Element("Calender").Element(((Months)setDate.Month).ToString());
+            XElement root = saveFile.getXML().Root.Element("Calender").Element(((Months)setDate.Month).ToString());
             Match match;
             bool exists = false;
             foreach (XElement node in root.Elements())
@@ -232,12 +218,13 @@ namespace Wallpaper_Calender_Caller
                 dayName.Add(fileName);
                 dayName.Add(styleType);
             }
+            foreach (Months month in Enum.GetValues(typeof(Months))) SortMonth(month);
         }
 
         private void SortMonth(Months month)
         {
             if (month == Months.Zero) return;
-            var root = settingsFile.Root.Element("Calender").Element(month.ToString());
+            var root = saveFile.getXML().Root.Element("Calender").Element(month.ToString());
             List<XElement> ordered = root.Elements().OrderBy(e => e.Name.ToString()).ToList();
             root.RemoveAll();
             root.Add(ordered);
@@ -247,30 +234,21 @@ namespace Wallpaper_Calender_Caller
         {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Filter = "Common Image Files|*.bmp; *.jpeg; *.jpg; *.png";
-            openFileDialog1.Title = "Select a Wallpaper OR folder";
+            openFileDialog1.Title = "Select an image file.";
             openFileDialog1.RestoreDirectory = true;
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                textBox1.Text = openFileDialog1.FileName;
-            }
+            if (openFileDialog1.ShowDialog() == DialogResult.OK) textBox1.Text = openFileDialog1.FileName;
         }
         private void browseFldBT_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog openFileDialog1 = new FolderBrowserDialog();
-            try
-            {
-                openFileDialog1.SelectedPath = Path.GetDirectoryName(textBox1.Text);
-            }
+            try {openFileDialog1.SelectedPath = Path.GetDirectoryName(textBox1.Text);}
             catch { }
-            if (openFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                textBox1.Text = openFileDialog1.SelectedPath;
-            }
+            if (openFileDialog1.ShowDialog() == DialogResult.OK) textBox1.Text = openFileDialog1.SelectedPath;
         }
         private void setBT_Click(object sender, EventArgs e)
         {
             DateTime currentDate = monthCalendar1.SelectedDates[0];
-            Settings currentSettings = LoadSettings();
+            Settings currentSettings = GetCurrentSettings();
             SetDate(currentDate, currentSettings);
             setStartingText(currentSettings.file);
             if (textBox1.Text != "")
@@ -278,6 +256,7 @@ namespace Wallpaper_Calender_Caller
                 DateItem di = BoldDate(currentDate, currentSettings.file);
                 boldedDates.Add(new DateEntry(currentDate, currentSettings.file, Wallpaper.Style.Centered));
                 monthCalendar1.AddDateInfo(di);
+                SetLabel(currentDate);
             }
             else
             {
@@ -286,13 +265,6 @@ namespace Wallpaper_Calender_Caller
                 RemoveBoldDate(currentDate);
             }
         }
-
-        private void setStartingText(string file)
-        {
-            startingText = file;
-            setBT.Text = "SET";
-        }
-
         private void clearBT_Click(object sender, EventArgs e)
         {
             DateTime currentDate = monthCalendar1.SelectedDates[0];
@@ -303,6 +275,7 @@ namespace Wallpaper_Calender_Caller
             centeredRB.Checked = false;
             setBT.Text = "SET";
             RemoveBoldDate(currentDate);
+            SetLabel(currentDate);
         }
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -315,23 +288,22 @@ namespace Wallpaper_Calender_Caller
             else openFileDialog1.RestoreDirectory = true;
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                settingsFile = LoadSettingsFile(openFileDialog1.FileName);
+                saveFile = new SaveFile(LoadSettingsFile(openFileDialog1.FileName));
                 currentLoadedFile = openFileDialog1.FileName;
                 SetTitleBar(currentLoadedFile);
                 Settings currentSettings = LoadDate(DateTime.Now);
-                UpdateSettings(currentSettings);
-                setStartingText(currentSettings.file);
+                UpdateSettings(currentSettings, DateTime.Now);
                 timeSinceSave = DateTime.Now;
                 monthCalendar1.ResetDateInfo();
                 boldedDates.Clear();
-                boldedDates.AddRange(Globals.LoadDates().ToArray());
+                boldedDates.AddRange(saveFile.LoadDates().ToArray());
                 monthCalendar1.AddDateInfo(BoldTheseDates(boldedDates).ToArray());
             }
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            XElement root = settingsFile.Root.Element("CurrentDate");
+            XElement root = saveFile.getXML().Root.Element("CurrentDate");
             // If it is the same day, and its a slideshow, don't change it.
             root.Element("Day").Value = new DateTime(1999, 1, 1).ToShortDateString();
             root.Element("File").Value = "";
@@ -350,14 +322,14 @@ namespace Wallpaper_Calender_Caller
                 if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                 {
                     currentLoadedFile = saveFileDialog1.FileName;
-                    settingsFile.Beautify(currentLoadedFile);
+                    saveFile.getXML().Beautify(currentLoadedFile);
                     SetTitleBar(currentLoadedFile);
                     timeSinceSave = DateTime.Now;
                 }
             }
             else
             {
-                settingsFile.Beautify(currentLoadedFile);
+                saveFile.getXML().Beautify(currentLoadedFile);
                 SetTitleBar(currentLoadedFile);
             }
         }
@@ -369,14 +341,14 @@ namespace Wallpaper_Calender_Caller
 
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            copySettings = LoadSettings();
+            copySettings = GetCurrentSettings();
             this.pasteToolStripMenuItem.Enabled = true;
             pasteBT.Enabled = true;
         }
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            UpdateSettings(copySettings);
+            UpdateSettings(copySettings, monthCalendar1.SelectedDates[0]);
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -432,27 +404,26 @@ namespace Wallpaper_Calender_Caller
         {
             if (textBox1.Text == "") return;
             DateEntry wallpaperData;
-            Settings settings = LoadSettings();
+            Settings settings = GetCurrentSettings();
             wallpaperData = new DateEntry(DateTime.Now, settings.file, settings.style);
             string wallPaper = wallpaperData.fileName;
             string newFile = "";
             if (!Path.HasExtension(wallpaperData.fileName))
             {
-                newFile = Globals.GetRandomWallpaper(wallpaperData.fileName, "");
+                newFile = saveFile.GetRandomWallpaper(wallpaperData.fileName, "");
                 if (newFile != "")
                     wallPaper = newFile;
                 else
                     return;
             }
-            Globals.SetWallpaper(wallPaper, wallpaperData.style);
+            saveFile.SetWallpaper(wallPaper, wallpaperData.style);
         }
         private void monthCalendar1_DateChanged(object sender, DayClickEventArgs e)
         {
-            this.monthCalendar1.SelectDate(Globals.DateFromString(e.Date));
-            Settings settings = LoadDate(Globals.DateFromString(e.Date));
-            UpdateSettings(settings);
-            setStartingText(settings.file);
+            DateTime date = Globals.DateFromString(e.Date);
+            this.monthCalendar1.SelectDate(date);
+            Settings settings = LoadDate(date);
+            UpdateSettings(settings, date);
         }
-
     }
 }

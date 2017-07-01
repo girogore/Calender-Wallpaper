@@ -52,13 +52,15 @@
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.monthCalendar1 = new Pabo.Calendar.MonthCalendar();
             this.setWallpaperBT = new System.Windows.Forms.Button();
+            this.currentWPLabel = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // setBT
             // 
-            this.setBT.Location = new System.Drawing.Point(238, 146);
+            this.setBT.Location = new System.Drawing.Point(239, 169);
             this.setBT.Name = "setBT";
             this.setBT.Size = new System.Drawing.Size(75, 23);
             this.setBT.TabIndex = 0;
@@ -109,7 +111,7 @@
             // 
             // browseFlBT
             // 
-            this.browseFlBT.Location = new System.Drawing.Point(550, 50);
+            this.browseFlBT.Location = new System.Drawing.Point(551, 73);
             this.browseFlBT.Name = "browseFlBT";
             this.browseFlBT.Size = new System.Drawing.Size(39, 20);
             this.browseFlBT.TabIndex = 5;
@@ -119,7 +121,7 @@
             // 
             // browseFldBT
             // 
-            this.browseFldBT.Location = new System.Drawing.Point(496, 50);
+            this.browseFldBT.Location = new System.Drawing.Point(497, 73);
             this.browseFldBT.Name = "browseFldBT";
             this.browseFldBT.Size = new System.Drawing.Size(48, 20);
             this.browseFldBT.TabIndex = 6;
@@ -129,7 +131,7 @@
             // 
             // clearBT
             // 
-            this.clearBT.Location = new System.Drawing.Point(319, 146);
+            this.clearBT.Location = new System.Drawing.Point(320, 169);
             this.clearBT.Name = "clearBT";
             this.clearBT.Size = new System.Drawing.Size(75, 23);
             this.clearBT.TabIndex = 7;
@@ -142,7 +144,7 @@
             this.groupBox1.Controls.Add(this.centeredRB);
             this.groupBox1.Controls.Add(this.stretchedRB);
             this.groupBox1.Controls.Add(this.tiledRB);
-            this.groupBox1.Location = new System.Drawing.Point(239, 50);
+            this.groupBox1.Location = new System.Drawing.Point(240, 73);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(104, 90);
             this.groupBox1.TabIndex = 8;
@@ -151,7 +153,7 @@
             // 
             // copyBT
             // 
-            this.copyBT.Location = new System.Drawing.Point(349, 51);
+            this.copyBT.Location = new System.Drawing.Point(350, 74);
             this.copyBT.Name = "copyBT";
             this.copyBT.Size = new System.Drawing.Size(75, 23);
             this.copyBT.TabIndex = 11;
@@ -162,7 +164,7 @@
             // pasteBT
             // 
             this.pasteBT.Enabled = false;
-            this.pasteBT.Location = new System.Drawing.Point(349, 80);
+            this.pasteBT.Location = new System.Drawing.Point(350, 103);
             this.pasteBT.Name = "pasteBT";
             this.pasteBT.Size = new System.Drawing.Size(75, 23);
             this.pasteBT.TabIndex = 12;
@@ -290,7 +292,7 @@
             // 
             // setWallpaperBT
             // 
-            this.setWallpaperBT.Location = new System.Drawing.Point(496, 146);
+            this.setWallpaperBT.Location = new System.Drawing.Point(497, 169);
             this.setWallpaperBT.Name = "setWallpaperBT";
             this.setWallpaperBT.Size = new System.Drawing.Size(92, 23);
             this.setWallpaperBT.TabIndex = 15;
@@ -298,12 +300,32 @@
             this.setWallpaperBT.UseVisualStyleBackColor = true;
             this.setWallpaperBT.Click += new System.EventHandler(this.setWallpaperBT_Click);
             // 
+            // currentWPLabel
+            // 
+            this.currentWPLabel.AutoSize = true;
+            this.currentWPLabel.Location = new System.Drawing.Point(289, 47);
+            this.currentWPLabel.Name = "currentWPLabel";
+            this.currentWPLabel.Size = new System.Drawing.Size(35, 13);
+            this.currentWPLabel.TabIndex = 16;
+            this.currentWPLabel.Text = "label1";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(239, 47);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(44, 13);
+            this.label1.TabIndex = 17;
+            this.label1.Text = "Current:";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(593, 213);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.currentWPLabel);
             this.Controls.Add(this.setWallpaperBT);
             this.Controls.Add(this.monthCalendar1);
             this.Controls.Add(this.pasteBT);
@@ -358,6 +380,8 @@
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
         private Pabo.Calendar.MonthCalendar monthCalendar1;
         private System.Windows.Forms.Button setWallpaperBT;
+        private System.Windows.Forms.Label currentWPLabel;
+        private System.Windows.Forms.Label label1;
     }
 }
 

@@ -27,82 +27,34 @@ namespace Wallpaper_Calender_Caller
                     return;
                 try
                 {
-                    Globals.setSettingsFile(args[1]);
-                    XDocument settingsFile = XDocument.Load(Globals.getSettingsFile());
-                    XElement root = settingsFile.Root.Element("CurrentDate");
+                    SaveFile saveFile = new SaveFile(args[1]);
+                    XElement root = saveFile.getXML().Root.Element("CurrentDate");
                     // If it is the same day, and its a slideshow, don't change it.
                     if (DateTime.Now.ToShortDateString() == root.Element("Day").Value && !Path.HasExtension(root.Element("File").Value))
                         return;
 
                     DateEntry wallpaperData;
-                    wallpaperData = GetCurrentWallpaper();
+                    wallpaperData = saveFile.GetCurrentWallpaper(DateTime.Now);
                     string wallPaper = wallpaperData.fileName;
                     string newFile = "";
                     if (!Path.HasExtension(wallpaperData.fileName))
                     {
                         string lastEntry = root.Element("LastEntry").Value;
-                        newFile = Globals.GetRandomWallpaper(wallpaperData.fileName, lastEntry);
+                        newFile = saveFile.GetRandomWallpaper(wallpaperData.fileName, lastEntry);
                         if (newFile != "")
                             wallPaper = newFile;
                         else
                             return;
                     }
-                    Globals.SetWallpaper(wallPaper, wallpaperData.style);
+                    saveFile.SetWallpaper(wallPaper, wallpaperData.style);
                     root.Element("Day").Value = DateTime.Now.ToShortDateString();
                     root.Element("File").Value = wallpaperData.fileName;
                     root.Element("Style").Value = wallpaperData.style.ToString();
                     root.Element("LastEntry").Value = newFile;
-                    Globals.Beautify(settingsFile, Globals.getSettingsFile());
+                    Globals.Beautify(saveFile.getXML(), saveFile.getSettingsFileName());
                 }
                 catch { }
             }
-        }
-
-        public static DateEntry GetCurrentWallpaper()
-        {
-            List<DateEntry> allData = ReadXMLData(Globals.getSettingsFile());
-            DateTime currentTime = DateTime.Now;
-            if (allData.Count == 0) return new DateEntry(DateTime.Now, "", Wallpaper.Style.Stretched);
-            else if (allData.Count == 1) return new DateEntry(DateTime.Now, allData[0].fileName, allData[0].style);
-
-            DateEntry previousVal = new DateEntry(DateTime.Now, "", Wallpaper.Style.Stretched);
-            foreach (DateEntry entry in allData)
-            {
-                if (entry.date.Month <= DateTime.Now.Month && entry.date.Day <= DateTime.Now.Day)
-                {
-                    previousVal = entry;
-                }
-                else
-                {
-                    if (previousVal.fileName == "")
-                        // Then we actually want the final entry
-                        return allData.Last();
-                    else
-                        return previousVal;
-                }
-            }
-            return previousVal;
-        }
-
-        public static List<DateEntry> ReadXMLData(string fileName)
-        {
-            XDocument settingsFile = XDocument.Load(fileName);
-            XElement root = settingsFile.Root.Element("Calender");
-            List<DateEntry> ret = new List<DateEntry>();
-            Match match;
-            foreach (XElement month in root.Elements())
-            {
-                foreach (XElement day in month.Elements())
-                {
-                    match = Regex.Match(day.Name.ToString(), @"\d+");
-                    ret.Add(
-                        new DateEntry(
-                        new DateTime(DateTime.Now.Year, (int)Globals.ToEnum<Months>(month.Name.ToString()), Convert.ToInt32(match.Value)),
-                        day.Element("File").Value.ToString(),
-                        Globals.ToEnum<Wallpaper.Style>(day.Element("Style").Value.ToString())));
-                }
-            }
-            return ret;
         }
     }
 }

@@ -95,10 +95,8 @@ namespace Wallpaper_Calender_Caller
             DateEntry previousVal = new DateEntry(date, "", Wallpaper.Style.Stretched);
             foreach (DateEntry entry in allData)
             {
-                if (entry.date.Month <= date.Month && entry.date.Day <= date.Day)
-                {
+                if ((entry.date.Month < date.Month) || (entry.date.Month == date.Month && entry.date.Day <= date.Day))
                     previousVal = entry;
-                }
                 else
                 {
                     if (previousVal.fileName == "")

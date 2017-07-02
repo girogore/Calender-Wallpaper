@@ -14,6 +14,8 @@ HOW TO USE:
     * Create Task.  
     * Provide a Name.  
     * Triggers: Daily: At whatever time you want. On logon/At startup.  
-    * Actions: Start a program browse -> choose the exe. Add Arguments: -caller "C:\path\to\save.xml"
+    * Actions:  
+      + Start a program browse -> choose the exe. 
+      + Add Arguments: -caller "C:\path\to\save.xml"
   
 4. Done!

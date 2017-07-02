@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Runtime.InteropServices;
 using System.IO;
-using System.Xml;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using System.Xml.Linq;
 using Pabo.Calendar;
 
@@ -79,7 +74,7 @@ namespace Wallpaper_Calender_Caller
                         root.Element("File").Value = "";
                         root.Element("Style").Value = "";
 
-                        foreach (Months month in Enum.GetValues(typeof(Months))){SortMonth(month);}
+                        //foreach (Months month in Enum.GetValues(typeof(Months))){SortMonth(month);}
                         if (currentLoadedFile == "")
                         {
                             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
@@ -184,7 +179,7 @@ namespace Wallpaper_Calender_Caller
                 if (Convert.ToInt32(match.Value) == removeDate.Day)
                 {
                     node.Remove();
-                    foreach (Months month in Enum.GetValues(typeof(Months))) SortMonth(month);
+                    SortMonth((Months)removeDate.Month);
                     return true;
                 }
             }
@@ -218,7 +213,7 @@ namespace Wallpaper_Calender_Caller
                 dayName.Add(fileName);
                 dayName.Add(styleType);
             }
-            foreach (Months month in Enum.GetValues(typeof(Months))) SortMonth(month);
+            SortMonth((Months)setDate.Month);
         }
 
         private void SortMonth(Months month)
@@ -310,7 +305,8 @@ namespace Wallpaper_Calender_Caller
             root.Element("Style").Value = "";
             root.Element("LastEntry").Value = "-1";
 
-            foreach (Months month in Enum.GetValues(typeof(Months))) SortMonth(month);
+            
+            // foreach (Months month in Enum.GetValues(typeof(Months))) SortMonth(month);
             if (currentLoadedFile == "" || sender.Equals(saveAsToolStripMenuItem))
             {
                 SaveFileDialog saveFileDialog1 = new SaveFileDialog();

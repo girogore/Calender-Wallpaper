@@ -1,9 +1,11 @@
 # Calender-Wallpaper
-Program to change a windows background based on a calender schedule.
-
+Program to change a windows background based on a calender schedule.  
 Base of the Wallpaper Class : https://stackoverflow.com/questions/1061678/change-desktop-wallpaper-using-code-in-net
 
+NOTES:
 - Works for windows 10, unsure as to earlier versions of windows.
+
+DOWNLOAD:
 - .exe download: https://www.dropbox.com/s/i8lgj6f4x0d99r6/Wallpaper%20Calender%20Caller.exe?dl=0
 
 HOW TO USE:

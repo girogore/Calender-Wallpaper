@@ -12,12 +12,12 @@ HOW TO USE:
 2. Once scheduled save (this will create an .xml).
 3. Using Windows Task Scheduler. I would love to automate this with the GUI, but I have not.
 
-  *Create Task.
+  1. Create Task.
   
-  *Provide a Name.
+  2. Provide a Name.
   
-  *Triggers: Daily: At whatever time you want. On logon/At startup.
+  3. Triggers: Daily: At whatever time you want. On logon/At startup.
   
-  *Actions: Start a program browse -> choose the exe. Add Arguments: -caller "C:\path\to\save.xml"
+  4. Actions: Start a program browse -> choose the exe. Add Arguments: -caller "C:\path\to\save.xml"
   
 4. Done!

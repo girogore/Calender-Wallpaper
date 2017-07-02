@@ -11,8 +11,13 @@ HOW TO USE:
 -Folders will pick a random (skipping the previously chosen one the next day) image from the folder each day.
 2. Once scheduled save (this will create an .xml).
 3. Using Windows Task Scheduler. I would love to automate this with the GUI, but I have not.
+
 -Create Task.
+
 -Provide a Name.
+
 -Triggers: Daily: At whatever time you want. On logon/At startup.
+
 -Actions: Start a program browse -> choose the exe. Add Arguments: -caller "C:\path\to\save.xml"
+
 4. Done!

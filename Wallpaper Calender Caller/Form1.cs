@@ -344,7 +344,9 @@ namespace Wallpaper_Calender_Caller
 
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            string beforeText = textBox1.Text;
             UpdateSettings(copySettings, monthCalendar1.SelectedDates[0]);
+            if (textBox1.Text != beforeText) setBT.Text = "*SET*";
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)

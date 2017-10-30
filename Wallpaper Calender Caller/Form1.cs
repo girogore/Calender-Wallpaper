@@ -327,6 +327,7 @@ namespace Wallpaper_Calender_Caller
             {
                 saveFile.getXML().Beautify(currentLoadedFile);
                 SetTitleBar(currentLoadedFile);
+                timeSinceSave = DateTime.Now;
             }
         }
 
@@ -408,7 +409,7 @@ namespace Wallpaper_Calender_Caller
             string newFile = "";
             if (!Path.HasExtension(wallpaperData.fileName))
             {
-                newFile = saveFile.GetRandomWallpaper(wallpaperData.fileName, "");
+                newFile = saveFile.GetRandomWallpaper(wallpaperData.fileName, "").fileName;
                 if (newFile != "")
                     wallPaper = newFile;
                 else

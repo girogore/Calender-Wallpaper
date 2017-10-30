@@ -45,9 +45,11 @@ namespace Wallpaper_Calender_Caller
             }
             return ret;
         }
-        public string GetRandomWallpaper(string folder, string lastEntry)
+        public DateEntry GetRandomWallpaper(string folder, string lastEntry)
         {
             // *.bmp; *.jpeg; *.jpg; *.png"
+            DateEntry ret = new DateEntry();
+            ret.errorList = new List<Tuple<DateTime, string>>();
             try
             {
                 DirectoryInfo di = new DirectoryInfo(folder);
@@ -59,11 +61,25 @@ namespace Wallpaper_Calender_Caller
                 for (int i = 0; i < 10; i++)
                 {
                     ran = rd.Next(files.Count());
-                    if (files[ran].Name != lastEntry) break;
+                    if (files[ran].Name != lastEntry)
+                    {
+                        if (i != 0)
+                            ret.errorList.Add(Tuple.Create(DateTime.Now, "Randomed same wallpaper " + i.ToString() + " times in a row."));
+                        break;
+                    }
+                    if (i == 9)
+                        ret.errorList.Add(Tuple.Create(DateTime.Now, "Randomed same wallpaper 10 times in a row."));
                 }
-                return Path.Combine(folder, files[ran].Name);
+                ret.fileName = Path.Combine(folder, files[ran].Name);
+                ret.errorList.Add(Tuple.Create(DateTime.Now, "Found wallpaper :: " + ret.fileName));
+                return ret;
             }
-            catch { return ""; }
+            catch (Exception e)
+            {
+                ret.errorList.Add(Tuple.Create(DateTime.Now, e.ToString()));
+                ret.fileName = "";
+                return ret;
+            }
         }
         public List<DateEntry> ReadXMLData()
         {

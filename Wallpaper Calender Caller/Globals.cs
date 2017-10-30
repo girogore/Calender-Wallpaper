@@ -44,11 +44,13 @@ namespace Wallpaper_Calender_Caller
         public DateTime date;
         public string fileName;
         public Wallpaper.Style style;
+        public List<Tuple<DateTime, string>> errorList;
         public DateEntry(DateTime xdate, string xfilename, Wallpaper.Style xstyle)
         {
             date = xdate;
             fileName = xfilename;
             style = xstyle;
+            errorList = new List<Tuple<DateTime, string>>();
         }
     }
 

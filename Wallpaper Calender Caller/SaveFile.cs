@@ -53,20 +53,21 @@ namespace Wallpaper_Calender_Caller
             try
             {
                 DirectoryInfo di = new DirectoryInfo(folder);
-                string[] extentionArray = new string[] { ".bmp", ".jpeg", ".jpg", ".png" };
-                HashSet<string> allowedExtensions = new HashSet<string>(extentionArray, StringComparer.OrdinalIgnoreCase);
+                string[] extensionArray = new string[] { ".bmp", ".jpeg", ".jpg", ".png" };
+                HashSet<string> allowedExtensions = new HashSet<string>(extensionArray, StringComparer.OrdinalIgnoreCase);
                 Random rd = new Random();
                 int ran = -1;
                 FileInfo[] files = Array.FindAll(di.GetFiles(), f => allowedExtensions.Contains(f.Extension));
                 for (int i = 0; i < 10; i++)
                 {
                     ran = rd.Next(files.Count());
-                    if (files[ran].Name != lastEntry)
+                    if (files[ran].Name == lastEntry)
                     {
                         if (i != 0)
                             ret.errorList.Add(Tuple.Create(DateTime.Now, "Randomed same wallpaper " + i.ToString() + " times in a row."));
-                        break;
                     }
+                    else
+                        break;
                     if (i == 9)
                         ret.errorList.Add(Tuple.Create(DateTime.Now, "Randomed same wallpaper 10 times in a row."));
                 }

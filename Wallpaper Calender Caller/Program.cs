@@ -43,7 +43,7 @@ namespace Wallpaper_Calender_Caller
                                 if (log)
                                 {
                                     using (StreamWriter w = File.AppendText(logFile))
-                                        w.WriteLine("'{0}' :: {1}", DateTime.Now.ToString("F"), "Day already checked.");
+                                        w.WriteLine("'{0}' :: {1}", DateTime.Now.ToString("G"), "Day already checked.");
                                 }
                                 return;
                             }
@@ -72,9 +72,9 @@ namespace Wallpaper_Calender_Caller
                                 using (StreamWriter w = File.AppendText(logFile))
                                 {
                                     foreach (Tuple<DateTime, string> error in wallpaperData.errorList)
-                                        w.WriteLine("'{0}' :: {1}", error.Item1.ToString("F"), error.Item2);
+                                        w.WriteLine("'{0}' :: {1}", error.Item1.ToString("G"), error.Item2);
                                     foreach (Tuple<DateTime, string> error in newFile.errorList)
-                                        w.WriteLine("'{0}' :: {1}", error.Item1.ToString("F"), error.Item2);
+                                        w.WriteLine("'{0}' :: {1}", error.Item1.ToString("G"), error.Item2);
                                 }
                             }
                         }

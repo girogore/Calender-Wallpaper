@@ -59,7 +59,17 @@ namespace Wallpaper_Calender_Caller
                                 if (newFile.fileName != "")
                                     wallPaper = newFile.fileName;
                                 else
+                                {
+                                    if (log)
+                                    {
+                                        using (StreamWriter w = File.AppendText(logFile))
+                                        {
+                                            foreach (Tuple<DateTime, string> error in newFile.errorList)
+                                                w.WriteLine("'{0}' :: {1}", error.Item1.ToString("G"), error.Item2);
+                                        }
+                                    }
                                     return;
+                                }
                             }
                             saveFile.SetWallpaper(wallPaper, wallpaperData.style);
                             root.Element("Day").Value = DateTime.Now.ToShortDateString();
@@ -84,7 +94,7 @@ namespace Wallpaper_Calender_Caller
                             {
                                 using (StreamWriter w = File.AppendText(logFile))
                                 {
-                                    w.WriteLine("'{0}' :: {1}", DateTime.Now, e.ToString());
+                                    w.WriteLine("'{0}' :: {1}", DateTime.Now, e.Message.ToString());
                                 }
                             }
                         }
@@ -92,6 +102,7 @@ namespace Wallpaper_Calender_Caller
                     catch { }
                 }
             }
+            return;
         }
     }
 }

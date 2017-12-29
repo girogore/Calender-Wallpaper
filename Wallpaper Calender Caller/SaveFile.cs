@@ -77,7 +77,7 @@ namespace Wallpaper_Calender_Caller
             }
             catch (Exception e)
             {
-                ret.errorList.Add(Tuple.Create(DateTime.Now, e.ToString()));
+                ret.errorList.Add(Tuple.Create(DateTime.Now, e.Message.ToString()));
                 ret.fileName = "";
                 return ret;
             }

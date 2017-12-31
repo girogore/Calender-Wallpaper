@@ -12,8 +12,6 @@ namespace Wallpaper_Calender_Caller
         [STAThread]
         static void Main(string[] args)
         {
-            bool log = false;
-            string logFile = "";
             if (args.Count() == 0)
             {
                 Application.EnableVisualStyles();
@@ -22,17 +20,13 @@ namespace Wallpaper_Calender_Caller
             }
             else
             {
-                if (args.Contains("-log")) {
-                    log = true;
-                }
                 if (args.Contains("-caller"))
                 {
                     string target = args[Array.IndexOf(args, "-caller") + 1];
                     try
                     {
                         SaveFile saveFile = new SaveFile(target);
-                        if (log)
-                            logFile = Path.Combine(Path.GetDirectoryName(target), Path.GetFileNameWithoutExtension(target) + ".log");
+                        LogFile log = new LogFile(Path.Combine(Path.GetDirectoryName(target), Path.GetFileNameWithoutExtension(target) + ".log"), args.Contains("-log"));
                         try
                         {
 
@@ -40,11 +34,7 @@ namespace Wallpaper_Calender_Caller
                             // If it is the same day, and its a slideshow, don't change it.
                             if (DateTime.Now.ToShortDateString() == root.Element("Day").Value && !Path.HasExtension(root.Element("File").Value))
                             {
-                                if (log)
-                                {
-                                    using (StreamWriter w = File.AppendText(logFile))
-                                        w.WriteLine("'{0}' :: {1}", DateTime.Now.ToString("G"), "Day already checked.");
-                                }
+                                log.writeLine(DateTime.Now, "Day already checked.");
                                 return;
                             }
                             DateEntry wallpaperData;
@@ -60,14 +50,7 @@ namespace Wallpaper_Calender_Caller
                                     wallPaper = newFile.fileName;
                                 else
                                 {
-                                    if (log)
-                                    {
-                                        using (StreamWriter w = File.AppendText(logFile))
-                                        {
-                                            foreach (Tuple<DateTime, string> error in newFile.errorList)
-                                                w.WriteLine("'{0}' :: {1}", error.Item1.ToString("G"), error.Item2);
-                                        }
-                                    }
+                                    log.writeLine(newFile.errorList.ToArray());
                                     return;
                                 }
                             }
@@ -77,29 +60,19 @@ namespace Wallpaper_Calender_Caller
                             root.Element("Style").Value = wallpaperData.style.ToString();
                             root.Element("LastEntry").Value = newFile.fileName;
                             Globals.Beautify(saveFile.getXML(), saveFile.getSettingsFileName());
-                            if (log)
-                            {
-                                using (StreamWriter w = File.AppendText(logFile))
-                                {
-                                    foreach (Tuple<DateTime, string> error in wallpaperData.errorList)
-                                        w.WriteLine("'{0}' :: {1}", error.Item1.ToString("G"), error.Item2);
-                                    foreach (Tuple<DateTime, string> error in newFile.errorList)
-                                        w.WriteLine("'{0}' :: {1}", error.Item1.ToString("G"), error.Item2);
-                                }
-                            }
+
+                            log.writeLine(wallpaperData.errorList.ToArray());
+                            log.writeLine(newFile.errorList.ToArray());
                         }
                         catch (Exception e)
                         {
-                            if (log)
-                            {
-                                using (StreamWriter w = File.AppendText(logFile))
-                                {
-                                    w.WriteLine("'{0}' :: {1}", DateTime.Now, e.Message.ToString());
-                                }
-                            }
+                            log.writeLine(DateTime.Now, e.Message.ToString());
                         }
                     }
-                    catch { }
+                    catch
+                    { 
+                        //Cannot access the logfile or xml 
+                    }
                 }
             }
             return;
